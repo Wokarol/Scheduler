@@ -5,7 +5,7 @@ namespace Wokarol.ScheduleSystem
     /// <summary>
     /// Handles scheduling actions for static instance of ScheduleHandler with PlayerLoopClock
     /// </summary>
-    public class Scheduler
+    public static class Scheduler
     {
         // Static Handle
         static ScheduleHandler instance;
