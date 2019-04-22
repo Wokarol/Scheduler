@@ -4,6 +4,9 @@ using Wokarol.Clocks;
 
 namespace Wokarol.ScheduleSystem
 {
+    /// <summary>
+    /// Handles delaying and repeating of actions
+    /// </summary>
     public class ScheduleHandler
     {
         /// <summary>

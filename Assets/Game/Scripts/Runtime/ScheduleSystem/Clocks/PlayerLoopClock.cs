@@ -5,6 +5,9 @@ using UnityEngine.Experimental.PlayerLoop;
 
 namespace Wokarol.Clocks
 {
+    /// <summary>
+    /// Clock hooked up to PlayerLoopSystem, fires OnTick before each update (singleton)
+    /// </summary>
     public class PlayerLoopClock : IClock
     {
         public static PlayerLoopClock Instance { get; private set; }
