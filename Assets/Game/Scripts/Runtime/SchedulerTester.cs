@@ -11,9 +11,9 @@ public class SchedulerTester : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space)) {
             output.AddBubble("A");
             Scheduler.Delay(() => output.AddBubble("B"), 2f);
-            Scheduler.Delay(() => output.AddBubble("C"), 3f);
-            Scheduler.Repeat(() => output.AddBubble("D"), 1.5f);
-            Scheduler.Repeat(() => output.AddBubble("E"), 1.5f, 2);
+            //Scheduler.Delay(() => output.AddBubble("C"), 3f);
+            //Scheduler.Repeat(() => output.AddBubble("D"), 1.5f);
+            //Scheduler.Repeat(() => output.AddBubble("E"), 1.5f, 2);
         }
     }
 }
