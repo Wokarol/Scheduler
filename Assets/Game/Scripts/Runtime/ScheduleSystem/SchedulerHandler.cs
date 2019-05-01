@@ -32,7 +32,7 @@ namespace Wokarol.ScheduleSystem
             clock.OnTick += Tick;
         }
 
-        public void Tick(float delta) {
+        void Tick(float delta) {
 
             // Loop through every delayed action
             for (int i = delayedActions.Count - 1; i >= 0; i--) {
@@ -81,8 +81,9 @@ namespace Wokarol.ScheduleSystem
         /// </summary>
         /// <param name="action">Action to invoke</param>
         /// <param name="time">Delay in seconds</param>
-        public void Delay(Action action, float time) {
+        public ActionHandle Delay(Action action, float time) {
             delayedActions.Add(new DelayedAction(action, time));
+            return new ActionHandle(0, ActionType.Delayed, this);
         }
 
         /// <summary>
@@ -90,8 +91,8 @@ namespace Wokarol.ScheduleSystem
         /// </summary>
         /// <param name="action">Action to repeat</param>
         /// <param name="interval">Interval in seconds</param>
-        public void Repeat(Action action, float interval) {
-            repeatedActions.Add(new RepeatedAction(action, interval, -1));
+        public ActionHandle Repeat(Action action, float interval) {
+            return Repeat(action, interval, -1);
         }
 
         /// <summary>
@@ -100,9 +101,9 @@ namespace Wokarol.ScheduleSystem
         /// <param name="action">Action to repeat</param>
         /// <param name="interval">Interval in seconds</param>
         /// <param name="count">Amount of repeats</param>
-        public void Repeat(Action action, float interval, int count) {
-            if (count <= 0) throw new ArgumentOutOfRangeException($"{nameof(count)} need to be positive");
+        public ActionHandle Repeat(Action action, float interval, int count) {
             repeatedActions.Add(new RepeatedAction(action, interval, count));
+            return new ActionHandle(0, ActionType.Repeat, this);
         }
 
         /// <summary>
@@ -187,7 +188,7 @@ namespace Wokarol.ScheduleSystem
             Source = source;
         }
 
-        public bool DeleteAction() {
+        public bool Delete() {
             return Source.DeleteAction(this);
         }
     }
