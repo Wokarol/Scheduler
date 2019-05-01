@@ -22,47 +22,44 @@ namespace Wokarol.ScheduleSystem
         /// <summary>
         /// All currently tracked delayed actions
         /// </summary>
-        private Dictionary<int, DelayedAction> delayedActions = new Dictionary<int, DelayedAction>();
+        private List<DelayedAction> delayedActions = new List<DelayedAction>();
         /// <summary>
         /// All currently tracked repeated actions
         /// </summary>
-        private Dictionary<int, RepeatedAction> repeatedActions = new Dictionary<int, RepeatedAction>();
+        private List<RepeatedAction> repeatedActions = new List<RepeatedAction>();
 
         public ScheduleHandler(IClock clock) {
             clock.OnTick += Tick;
         }
 
         public void Tick(float delta) {
-            var keys = new int[UnityEngine.Mathf.Max(delayedActions.Count, repeatedActions.Count)];
 
             // Loop through every delayed action
-            delayedActions.Keys.CopyTo(keys, 0);
             for (int i = delayedActions.Count - 1; i >= 0; i--) {
-                EvaluateDelayedAction(delta, keys[i]);
+                EvaluateDelayedAction(delta, i);
             }
 
             // Loop through every repeated action
-            repeatedActions.Keys.CopyTo(keys, 0);
             for (int i = repeatedActions.Count - 1; i >= 0; i--) {
-                EvaluateRepeatedAction(delta, keys[i]);
+                EvaluateRepeatedAction(delta, i);
             }
         }
 
-        private void EvaluateDelayedAction(float delta, int key) {
-            var delayedAction = delayedActions[key];
+        private void EvaluateDelayedAction(float delta, int i) {
+            var delayedAction = delayedActions[i];
             delayedAction.Countdown -= delta;
 
             // Invoke action if countdown reached 0 or below
             if (delayedAction.Countdown <= 0) {
                 delayedAction.Action.Invoke();
-                delayedActions.Remove(key);
+                delayedActions.RemoveAt(i);
             } else {
-                delayedActions[key] = delayedAction;
+                delayedActions[i] = delayedAction;
             }
         }
 
-        private void EvaluateRepeatedAction(float delta, int key) {
-            var repeatedAction = repeatedActions[key];
+        private void EvaluateRepeatedAction(float delta, int i) {
+            var repeatedAction = repeatedActions[i];
             repeatedAction.Countdown -= delta;
 
             // Invoke action if countdown reached 0 or below
@@ -73,9 +70,9 @@ namespace Wokarol.ScheduleSystem
             }
             // Remove action if count reached 0 (it will never happen if action count with -1)
             if (repeatedAction.Count == 0) {
-                repeatedActions.Remove(key);
+                repeatedActions.RemoveAt(i);
             } else {
-                repeatedActions[key] = repeatedAction;
+                repeatedActions[i] = repeatedAction;
             }
         }
 
@@ -85,8 +82,7 @@ namespace Wokarol.ScheduleSystem
         /// <param name="action">Action to invoke</param>
         /// <param name="time">Delay in seconds</param>
         public void Delay(Action action, float time) {
-            int key = GetFreeID(delayedActions.Keys);
-            delayedActions.Add(key, new DelayedAction(action, time));
+            delayedActions.Add(new DelayedAction(action, time));
         }
 
         /// <summary>
@@ -95,7 +91,7 @@ namespace Wokarol.ScheduleSystem
         /// <param name="action">Action to repeat</param>
         /// <param name="interval">Interval in seconds</param>
         public void Repeat(Action action, float interval) {
-            repeatedActions.Add(GetFreeID(repeatedActions.Keys), new RepeatedAction(action, interval, -1));
+            repeatedActions.Add(new RepeatedAction(action, interval, -1));
         }
 
         /// <summary>
@@ -106,7 +102,7 @@ namespace Wokarol.ScheduleSystem
         /// <param name="count">Amount of repeats</param>
         public void Repeat(Action action, float interval, int count) {
             if (count <= 0) throw new ArgumentOutOfRangeException($"{nameof(count)} need to be positive");
-            repeatedActions.Add(GetFreeID(repeatedActions.Keys), new RepeatedAction(action, interval, count));
+            repeatedActions.Add(new RepeatedAction(action, interval, count));
         }
 
         /// <summary>
