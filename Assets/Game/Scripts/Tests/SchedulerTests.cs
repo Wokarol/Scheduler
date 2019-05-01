@@ -89,16 +89,62 @@ namespace Wokarol.Tests
         }
 
         [Test]
-        public void _02_Delayed_Action_Can_Be_Deleted() {
+        public void _07_Delayed_Action_Can_Be_Deleted() {
             List<string> callHistory = new List<string>();
             var handle = scheduler.Delay(() => callHistory.Add("A"), 2);
 
-            handle.Delete();
+            bool deleteResult = handle.Delete();
+            Assert.That(deleteResult, Is.EqualTo(true));
 
             TickAndCheckHistory(callHistory);
             TickAndCheckHistory(callHistory);
             TickAndCheckHistory(callHistory);
             TickAndCheckHistory(callHistory);
+        }
+
+        [Test]
+        public void _08_Deleting_Executed_Delayed_Action_Returs_False() {
+            List<string> callHistory = new List<string>();
+            var handle = scheduler.Delay(() => callHistory.Add("A"), 2);
+
+            TickAndCheckHistory(callHistory);
+            TickAndCheckHistory(callHistory, "A");
+
+            bool deleteResult = handle.Delete();
+            Assert.That(deleteResult, Is.EqualTo(false));
+
+            TickAndCheckHistory(callHistory, "A");
+            TickAndCheckHistory(callHistory, "A");
+        }
+
+        [Test]
+        public void _09_Repeated_Action_Can_Be_Deleted() {
+            List<string> callHistory = new List<string>();
+            var handle = scheduler.Repeat(() => callHistory.Add("A"), 2);
+
+            bool deleteResult = handle.Delete();
+            Assert.That(deleteResult, Is.EqualTo(true));
+
+            TickAndCheckHistory(callHistory);
+            TickAndCheckHistory(callHistory);
+            TickAndCheckHistory(callHistory);
+            TickAndCheckHistory(callHistory);
+        }
+
+        [Test]
+        public void _10_Repeated_Action_Can_Be_Deleted_After_First_Call() {
+            List<string> callHistory = new List<string>();
+            var handle = scheduler.Repeat(() => callHistory.Add("A"), 2);
+
+
+            TickAndCheckHistory(callHistory);
+            TickAndCheckHistory(callHistory, "A");
+
+            bool deleteResult = handle.Delete();
+            Assert.That(deleteResult, Is.EqualTo(true));
+
+            TickAndCheckHistory(callHistory, "A");
+            TickAndCheckHistory(callHistory, "A");
         }
 
         private void TickAndCheckHistory(List<string> callHistory, params string[] expectedCalls) {
